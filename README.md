@@ -18,4 +18,14 @@ There exists ~20 ms delay between an event code and the onset of the LCD screen.
 
 
 ----
-Related functions `erptimeshift.m` & `eegtimeshift.m` in ERPLAB.
+### Previous Research 
+
+- Related ERPLAB functions `erptimeshift.m` & `eegtimeshift.m`
+- [EEGLAB Forums: Event code shifting](http://sccn.ucsd.edu/pipermail/eeglablist/2006/001534.html)
+ 
+ ```Matlab
+ for index = 1:length(EEG.event)
+    EEG.event(index).latency = EEG.event(index).latency-0.05*srate;
+end;
+EEG = eeg_checkset(EEG, 'eventconsistency'); % check for out of bound events [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); % store dataset in ALLEEG eeglab redraw; % redraw GUI
+```
