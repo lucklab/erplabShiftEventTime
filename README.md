@@ -23,6 +23,8 @@ There exists ~20 ms delay between an event code and the onset of the LCD screen.
 - Related ERPLAB functions `erptimeshift.m` & `eegtimeshift.m`
 - [EEGLAB Forums: Event code shifting](http://sccn.ucsd.edu/pipermail/eeglablist/2006/001534.html)
  
+> I was wondering whether there is a possibility in eeglab to shift all
+> event markers by 50 ms backwards in time?
  ```Matlab
  for index = 1:length(EEG.event)
     EEG.event(index).latency = EEG.event(index).latency-0.05*srate;
