@@ -15,3 +15,7 @@ Output:
 Purpose:
 
 There exists ~20 ms delay between an event code and the onset of the LCD screen. We want to correct this delay, by shifting the stimulus-event codes (only) later in time. All other event codes not specified by the user are kept at their original timepoints. 
+
+
+----
+Related functions `erptimeshift.m` & `eegtimeshift.m` in ERPLAB.
