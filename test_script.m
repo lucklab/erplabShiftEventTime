@@ -1,5 +1,5 @@
 %% Test script
-function test_script()
+function [outputEEG outputEvents] = test_script()
 try
     
     eeglab;
@@ -7,24 +7,38 @@ try
     % Load test data set
     data_filename = 'S1_EEG.set';
     data_filepath = './data/';
-    inputEEG = pop_loadset('filename', data_filename, 'filepath', data_filepath);
+    inputEEG = pop_loadset('filename', data_filename ...
+        , 'filepath', data_filepath);
     
     % View data
-    eegplot(inputEEG.data ...
-        , 'srate'    , inputEEG.srate ...
-        , 'events'   , inputEEG.event ...
-        , 'winlength', 20);
+    %     eegplot(inputEEG.data ...
+    %         , 'srate'    , inputEEG.srate ...
+    %         , 'events'   , inputEEG.event ...
+    %         , 'winlength', 20);
     
     eventcodes = [22 19];
-    timeshift  = 0.100;
+    timeshift  = 0.23452345;
     outputEEG  = erplabEegTimeShift(inputEEG, eventcodes, timeshift);
     
     
     % View data
-    eegplot(outputEEG.data ...
-        , 'srate'    , outputEEG.srate ...
-        , 'events'   , outputEEG.event ...
-        , 'winlength', 20);
+    %     eegplot(outputEEG.data ...
+    %         , 'srate'    , outputEEG.srate ...
+    %         , 'events'   , outputEEG.event ...
+    %         , 'winlength', 20);
+    %
+    
+    inputEvents           = struct2table(inputEEG.event);
+    outputEvents          = struct2table(outputEEG.event);
+    outputEvents.urevent  = [];
+    outputEvents.duration = [];
+    latencyDiff           = (outputEvents.latency-inputEvents.latency);
+    timeDiff              = latencyDiff * (1/inputEEG.srate);
+    
+    outputEvents = [ outputEvents ...
+        table(inputEvents.latency, 'VariableNames', {'inputLatency'}) ...
+        table(latencyDiff) ...
+        table(timeDiff)  ];
     
 catch err;
     rethrow(err);
