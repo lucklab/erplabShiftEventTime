@@ -15,9 +15,9 @@ try
         , 'events'   , inputEEG.event ...
         , 'winlength', 20);
     
-    events  = [22 21];
-    time_ms = 50;
-    outputEEG = erplabEegTimeShift(inputEEG, events, time_ms);
+    eventcodes = {'22', '222'};
+    timeshift  = 0.500;
+    outputEEG  = erplabEegTimeShift(inputEEG, eventcodes, timeshift);
     
     
     % View data
@@ -26,7 +26,7 @@ try
         , 'events'   , outputEEG.event ...
         , 'winlength', 20);
     
-catch(err);
+catch err;
     rethrow(err);
 end
 
@@ -34,8 +34,32 @@ end % function
 
 %% Function
 
-function outputEEG = erplabEegTimeShift(inputEEG, ~, ~)
+function outputEEG = erplabEegTimeShift(inputEEG, eventcodes, timeshift)
 
 outputEEG = inputEEG;
+
+sample_shift = timeshift * inputEEG.srate;
+
+% Accessing latencies based on specified event codes
+event_table = struct2table(inputEEG.event);
+event_table.type = categorical(event_table.type);
+
+% Copy the original latencies
+% old_latency = event_table.latency;
+% event_table = [event_table table(old_latency)];
+
+
+rows = ismember(event_table.type, eventcodes);
+vars = {'latency'};
+event_table{rows,vars} = event_table{rows,vars}+sample_shift;
+
+
+% check for latency differences
+% diff_latency = event_table.latency - event_table.old_latency;
+% event_table = [event_table table(diff_latency)];
+
+event_table.type = char(event_table.type);
+outputEEG.event = table2struct(event_table)';
+outputEEG = eeg_checkset(outputEEG, 'eventconsistency'); % check for out of bound events
 
 end
