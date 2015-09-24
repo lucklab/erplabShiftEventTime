@@ -1,5 +1,5 @@
 %% Test script
-function [outputEEG outputEvents] = test_script()
+function [outputEEG, outputEvents] = test_script()
 try
     
     eeglab;
@@ -17,7 +17,7 @@ try
     %         , 'winlength', 20);
     
     eventcodes = [22 19];
-    timeshift  = 0.23452345;
+    timeshift  = 0.015;
     outputEEG  = erplabEegTimeShift(inputEEG, eventcodes, timeshift);
     
     
@@ -79,6 +79,6 @@ eventsTable.type = char(eventsTable.type);
 outputEEG.event  = table2struct(eventsTable)';
 
 % check for out of bound events / Re-sort ur events
-outputEEG = eeg_checkset(outputEEG, 'eventconsistency'); 
+outputEEG = eeg_checkset(outputEEG, 'eventconsistency', 'checkur'); 
 
 end
