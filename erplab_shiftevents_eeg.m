@@ -1,4 +1,4 @@
-function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift)
+function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, displayFeedback)
 %ERPLAB_SHIFTEVENTS_EEG Shift the timing of user-specified event codes.
 %
 % FORMAT
@@ -7,11 +7,18 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift)
 %
 % INPUT:
 %
-%    EEG         - EEGLAB EEG dataset
-%    eventcodes  - list of event codes to shift
-%    timeshift   - time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
-%                  If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
-%                  If timeshift is 0, the EEG's time values are not shifted.
+%    EEG              - EEGLAB EEG dataset
+%    eventcodes       - list of event codes to shift
+%    timeshift        - time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
+%                       If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
+%                       If timeshift is 0, the EEG's time values are not shifted.
+% OPTIONAL INPUT:
+%
+%    displayFeedback  - 'summary'  - (defualt) Print summarized info to Command Window
+%                     - 'detailed' - Print event table with latency differences
+%                                    to Command Window
+%                     - 'both'     - Print both summarized & detailed info
+%                                    to Command Window
 %
 % OUTPUT:
 %
@@ -20,7 +27,7 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift)
 %
 % EXAMPLE:
 %
-%    eventcodes = [22 19];
+%    eventcodes = {22, 19};
 %    timeshift  = 0.015;
 %    outputEEG  = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift);
 %
@@ -57,6 +64,14 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift)
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+% Fill in optional variable.
+switch nargin
+    case 3
+        displayFeedback = 'summary';
+end
+
+
+
 outputEEG              = inputEEG;
 
 % Convert the shift time into samples to shift
@@ -82,17 +97,40 @@ outputEEG.event        = table2struct(eventsTable)';
 % check for out of bound events / Re-sort ur events
 outputEEG = eeg_checkset(outputEEG, 'eventconsistency', 'checkur');
 
+
+
+
+%% Detailed Feedback
+if(strcmpi(displayFeedback, 'detailed') || strcmpi(displayFeedback,'both'))
+    eventtable_input            = struct2table(inputEEG.event);
+    eventtable_output           = struct2table(outputEEG.event);
+    eventtable_output.urevent   = [];
+    eventtable_output.duration  = [];
+    latency_diff                = (  eventtable_output.latency ...
+        - eventtable_input.latency  );
+    time_diff                   = latency_diff * (1/inputEEG.srate);
+    
+    eventtable_output = [ eventtable_output ...
+        table(eventtable_input.latency ...
+          ,'VariableNames', {'original_latency'}) ...
+        table(latency_diff) ...
+        table(time_diff)  ];
+    disp(eventtable_output);
+end
+    
+
+%% Summarized Feedback
+
+if(strcmpi(displayFeedback, 'summary') || strcmpi(displayFeedback, 'both'))
+    numEventCodesShifted = height(eventsTable(rows,:));
+    numEventCodes        = height(eventsTable);
+    
+    fprintf('%7d of %7d event codes shifted %+2.3f seconds\n\n' ...
+        , numEventCodesShifted ...
+        , numEventCodes ...
+        , timeshift);
 end
 
 
 
 
-
-
-%% Debug Code
-% Copy the original latencies
-% old_latency = eventsTable.latency;
-% eventsTable = [eventsTable table(old_latency)];
-% check for latency differences
-% diff_latency = eventsTable.latency - eventsTable.old_latency;
-% eventsTable = [eventsTable table(diff_latency)];

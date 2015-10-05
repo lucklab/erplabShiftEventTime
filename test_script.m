@@ -1,5 +1,5 @@
 %% Test script
-function [outputEEG, outputEvents] = test_script()
+function [outputEEG, eventtable_output] = test_script()
 try
     
     eeglab;
@@ -16,9 +16,9 @@ try
     %         , 'events'   , inputEEG.event ...
     %         , 'winlength', 20);
     
-    eventcodes = [22 19];
+    eventcodes = {'22', '19'};
     timeshift  = 0.015;
-    outputEEG  = erplabEegTimeShift(inputEEG, eventcodes, timeshift);
+    outputEEG  = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift);
     
     
     % View data
@@ -28,17 +28,6 @@ try
     %         , 'winlength', 20);
     %
     
-    inputEvents           = struct2table(inputEEG.event);
-    outputEvents          = struct2table(outputEEG.event);
-    outputEvents.urevent  = [];
-    outputEvents.duration = [];
-    latencyDiff           = (outputEvents.latency-inputEvents.latency);
-    timeDiff              = latencyDiff * (1/inputEEG.srate);
-    
-    outputEvents = [ outputEvents ...
-        table(inputEvents.latency, 'VariableNames', {'inputLatency'}) ...
-        table(latencyDiff) ...
-        table(timeDiff)  ];
     
 catch err;
     rethrow(err);
