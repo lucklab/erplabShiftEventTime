@@ -1,4 +1,4 @@
-function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, displayFeedback)
+function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, sample_rounding,  displayFeedback)
 %ERPLAB_SHIFTEVENTS_EEG Shift the timing of user-specified event codes.
 %
 % FORMAT
@@ -67,6 +67,7 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift,
 % Fill in optional variable.
 switch nargin
     case 3
+        sample_rounding = 'floor';
         displayFeedback = 'summary';
 end
 
@@ -75,7 +76,20 @@ end
 outputEEG              = inputEEG;
 
 % Convert the shift time into samples to shift
-sample_shift           = timeshift * inputEEG.srate;
+switch sample_rounding
+    case 'floor'
+        % Round to nearest ingtowards positive infinity
+        sample_shift = floor(timeshift * inputEEG.srate);  
+    case 'ceiling'
+        % Round to nearest integer towards negative infinity
+        sample_shift = ceil(timeshift * inputEEG.srate);   
+    case 'nearest'
+        % Round to the nearest integer
+        sample_shift = round(timeshift * inputEEG.srate);  
+    otherwise
+        error('Rounding method is unspecified. Should be either "floor", "ceiling", "nearest".');
+end
+            
 
 % Convert EEG.data structure to a Matlab table
 % in order to select the user-specified event code latency
@@ -111,10 +125,10 @@ if(strcmpi(displayFeedback, 'detailed') || strcmpi(displayFeedback,'both'))
     time_diff                   = latency_diff * (1/inputEEG.srate);
     
     eventtable_output = [ eventtable_output ...
-        table(eventtable_input.latency ...
-          ,'VariableNames', {'original_latency'}) ...
-        table(latency_diff) ...
-        table(time_diff)  ];
+                         table(eventtable_input.latency ...
+                         ,'VariableNames', {'original_latency'}) ...
+                         table(latency_diff) ...
+                         table(time_diff)  ];
     disp(eventtable_output);
 end
     
