@@ -1,21 +1,31 @@
 # erplab_event_timeshift
 ERPLAB function to shift the time of specific event codes given by the user.
 
+#### Purpose
 
-User input:
+There exists ~20 ms delay between an event code and the onset of the LCD screen. We want to correct this delay, by shifting the stimulus-event codes later in time. All other event codes not specified by the user are kept at their original timepoints. 
+
+
+#### Input
 - Continuous EEG dataset
-- list of event codes to shift
-- how much time to shift the event codes
-- warning flags for event codes that we unable to be shift (for various reasons)
+- List of event codes to shift
+- How much time to shift the event codes
+- Method for rounding
+  - floor
+  - ceiling
+  - nearest
+- Warning flags for event codes that we unable to be shift (for various reasons)
 
-Output:
+#### Output
 - Continuous EEG dataset with the user-specified event codes shifted
 
-
-Purpose:
-
-There exists ~20 ms delay between an event code and the onset of the LCD screen. We want to correct this delay, by shifting the stimulus-event codes (only) later in time. All other event codes not specified by the user are kept at their original timepoints. 
-
+#### Example
+```matlab
+eventcodes = {'22', '19'};
+timeshift  = 0.015;
+rounding   = 'floor';
+outputEEG  = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, rounding);
+```
 
 ----
 ### Previous Research 
