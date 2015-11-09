@@ -14,7 +14,7 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift,
 %                       If timeshift is 0, the EEG's time values are not shifted.
 % OPTIONAL INPUT:
 %
-%    displayFeedback  - 'summary'  - (defualt) Print summarized info to Command Window
+%    displayFeedback  - 'summary'  - (default) Print summarized info to Command Window
 %                     - 'detailed' - Print event table with latency differences
 %                                    to Command Window
 %                     - 'both'     - Print both summarized & detailed info
@@ -68,6 +68,8 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift,
 switch nargin
     case 3
         sample_rounding = 'floor';
+        displayFeedback = 'summary';
+    case 4
         displayFeedback = 'summary';
 end
 
