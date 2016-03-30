@@ -1,9 +1,9 @@
-function [ outEEG ] = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift, sample_rounding,  displayFeedback)
-%ERPLAB_SHIFTEVENTS_EEG Shift the timing of user-specified event codes.
+function [ outEEG ] = erplabShiftEventTime(inEEG, eventcodes, timeshift, sample_rounding,  displayFeedback)
+%ERPLABSHIFTEVENTTIME In EEG data, shift the timing of user-specified event codes.
 %
 % FORMAT
 %
-%    EEG = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift)
+%    EEG = erplabShiftEventTime(inEEG, eventcodes, timeshift)
 %
 % INPUT:
 %
@@ -12,25 +12,31 @@ function [ outEEG ] = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift, sample
 %    timeshift        - time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
 %                       If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
 %                       If timeshift is 0, the EEG's time values are not shifted.
+%    rounding         - Type of rounding to use
+%                       - 'floor'   - Round to nearest ingtowards positive infinity
+%                       - 'ceiling' - Round to nearest integer towards negative infinity
+%                       - 'nearest' - Round to the nearest integer
+% 
 % OPTIONAL INPUT:
 %
-%    displayFeedback  - 'summary'  - (default) Print summarized info to Command Window
-%                     - 'detailed' - Print event table with latency differences
-%                                    to Command Window
-%                     - 'both'     - Print both summarized & detailed info
+%    displayFeedback  - 'summary'   - (default) Print summarized info to Command Window
+%                     - 'detailed'  - Print event table with latency differences
+%                                     to Command Window
+%                     - 'both'      - Print both summarized & detailed info
 %                                    to Command Window
 %
 % OUTPUT:
 %
-%    EEG         - EEGLAB EEG dataset with latency shift.
+%    EEG               - EEGLAB EEG dataset with latency shift.
 %
 %
 % EXAMPLE:
 %
-%    eventcodes = {22, 19};
-%    timeshift  = 0.015;
-%    outEEG     = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift);
-%
+%     eventcodes = {'22', '19'};
+%     timeshift  = 0.015;
+%     rounding   = 'floor';
+%     outputEEG  = erplabShiftEventTime(inputEEG, eventcodes, timeshift, rounding);
+%     
 %
 % Requirements:
 %   - EEG_CHECKSET (eeglab function)

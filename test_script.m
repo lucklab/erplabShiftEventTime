@@ -20,7 +20,7 @@ try
     eventcodes = {'22', '19'};
     timeshift  = 0.015;
     rounding   = 'floor';
-    outputEEG  = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, rounding);
+    outputEEG  = erplabShiftEventTime(inputEEG, eventcodes, timeshift, rounding);
     
     
     % View the Output data
