@@ -1,9 +1,9 @@
-function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift, sample_rounding,  displayFeedback)
+function [ outEEG ] = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift, sample_rounding,  displayFeedback)
 %ERPLAB_SHIFTEVENTS_EEG Shift the timing of user-specified event codes.
 %
 % FORMAT
 %
-%    EEG = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift)
+%    EEG = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift)
 %
 % INPUT:
 %
@@ -29,8 +29,11 @@ function [ outputEEG ] = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift,
 %
 %    eventcodes = {22, 19};
 %    timeshift  = 0.015;
-%    outputEEG  = erplab_shiftevents_eeg(inputEEG, eventcodes, timeshift);
+%    outEEG     = erplab_shiftEventsEeg(inEEG, eventcodes, timeshift);
 %
+%
+% Requirements:
+%   - EEG_CHECKSET (eeglab function)
 %
 % See also eegtimeshift.m erptimeshift.m
 %
@@ -75,19 +78,19 @@ end
 
 
 
-outputEEG              = inputEEG;
+outEEG              = inEEG;
 
 % Convert the shift time into samples to shift
 switch sample_rounding
     case 'floor'
         % Round to nearest ingtowards positive infinity
-        sample_shift = floor(timeshift * inputEEG.srate);  
+        sample_shift = floor(timeshift * inEEG.srate);  
     case 'ceiling'
         % Round to nearest integer towards negative infinity
-        sample_shift = ceil(timeshift * inputEEG.srate);   
+        sample_shift = ceil(timeshift * inEEG.srate);   
     case 'nearest'
         % Round to the nearest integer
-        sample_shift = round(timeshift * inputEEG.srate);  
+        sample_shift = round(timeshift * inEEG.srate);  
     otherwise
         error('Rounding method is unspecified. Should be either "floor", "ceiling", "nearest".');
 end
@@ -95,7 +98,7 @@ end
 
 % Convert EEG.data structure to a Matlab table
 % in order to select the user-specified event code latency
-eventsTable            = struct2table(inputEEG.event);
+eventsTable            = struct2table(inEEG.event);
 
 % Convert event codes to a categorical variable type for selection
 eventsTable.type       = categorical(eventsTable.type);
@@ -108,23 +111,23 @@ eventsTable{rows,vars} = eventsTable{rows,vars}+sample_shift;
 
 % Save the shifted events/latencies back into the EEGLAB EEG dataset
 eventsTable.type       = char(eventsTable.type);
-outputEEG.event        = table2struct(eventsTable)';
+outEEG.event           = table2struct(eventsTable)';
 
 % check for out of bound events / Re-sort ur events
-outputEEG = eeg_checkset(outputEEG, 'eventconsistency', 'checkur');
+outEEG = eeg_checkset(outEEG, 'eventconsistency', 'checkur');
 
 
 
 
 %% Detailed Feedback
 if(strcmpi(displayFeedback, 'detailed') || strcmpi(displayFeedback,'both'))
-    eventtable_input            = struct2table(inputEEG.event);
-    eventtable_output           = struct2table(outputEEG.event);
+    eventtable_input            = struct2table(inEEG.event);
+    eventtable_output           = struct2table(outEEG.event);
     eventtable_output.urevent   = [];
     eventtable_output.duration  = [];
     latency_diff                = (  eventtable_output.latency ...
         - eventtable_input.latency  );
-    time_diff                   = latency_diff * (1/inputEEG.srate);
+    time_diff                   = latency_diff * (1/inEEG.srate);
     
     eventtable_output = [ eventtable_output ...
                          table(eventtable_input.latency ...
@@ -135,8 +138,9 @@ if(strcmpi(displayFeedback, 'detailed') || strcmpi(displayFeedback,'both'))
 end
     
 
-%% Summarized Feedback
 
+
+%% Summarized Feedback
 if(strcmpi(displayFeedback, 'summary') || strcmpi(displayFeedback, 'both'))
     numEventCodesShifted = height(eventsTable(rows,:));
     numEventCodes        = height(eventsTable);
