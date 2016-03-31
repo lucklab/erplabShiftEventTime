@@ -22,7 +22,7 @@ function varargout = erplabShiftEventTimeGUI(varargin)
 
 % Edit the above text to modify the response to help erplabShiftEventTimeGUI
 
-% Last Modified by GUIDE v2.5 30-Mar-2016 14:26:39
+% Last Modified by GUIDE v2.5 31-Mar-2016 15:54:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -75,121 +75,183 @@ varargout{1} = handles.output;
 
 
 % --- Executes during object creation, after setting all properties.
-function density_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to density (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function density_Callback(hObject, eventdata, handles)
-% hObject    handle to density (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of density as text
-%        str2double(get(hObject,'String')) returns contents of density as a double
-density = str2double(get(hObject, 'String'));
-if isnan(density)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
-end
-
-% Save the new density value
-handles.metricdata.density = density;
-guidata(hObject,handles)
-
-% --- Executes during object creation, after setting all properties.
-function volume_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to volume (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+% function density_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to editboxReplaceChannels (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: popupmenu controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
 
 
 
-function volume_Callback(hObject, eventdata, handles)
-% hObject    handle to volume (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% function density_Callback(hObject, eventdata, handles)
+% % hObject    handle to editboxReplaceChannels (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: get(hObject,'String') returns contents of editboxReplaceChannels as text
+% %        str2double(get(hObject,'String')) returns contents of editboxReplaceChannels as a double
+% editboxReplaceChannels = str2double(get(hObject, 'String'));
+% if isnan(editboxReplaceChannels)
+%     set(hObject, 'String', 0);
+%     errordlg('Input must be a number','Error');
+% end
+% 
+% % Save the new editboxReplaceChannels value
+% handles.metricdata.editboxReplaceChannels = editboxReplaceChannels;
+% guidata(hObject,handles)
+% 
+% % --- Executes during object creation, after setting all properties.
+% function volume_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to editboxIgnoreChannels (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: popupmenu controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
+% 
+% 
+% 
+% function volume_Callback(hObject, eventdata, handles)
+% % hObject    handle to editboxIgnoreChannels (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: get(hObject,'String') returns contents of editboxIgnoreChannels as text
+% %        str2double(get(hObject,'String')) returns contents of editboxIgnoreChannels as a double
+% editboxIgnoreChannels = str2double(get(hObject, 'String'));
+% if isnan(editboxIgnoreChannels)
+%     set(hObject, 'String', 0);
+%     errordlg('Input must be a number','Error');
+% end
+% 
+% % Save the new editboxIgnoreChannels value
+% handles.metricdata.editboxIgnoreChannels = editboxIgnoreChannels;
+% guidata(hObject,handles)
 
-% Hints: get(hObject,'String') returns contents of volume as text
-%        str2double(get(hObject,'String')) returns contents of volume as a double
-volume = str2double(get(hObject, 'String'));
-if isnan(volume)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
-end
-
-% Save the new volume value
-handles.metricdata.volume = volume;
-guidata(hObject,handles)
-
-% --- Executes on button press in calculate.
-function calculate_Callback(hObject, eventdata, handles)
-% hObject    handle to calculate (see GCBO)
+% --- Executes on button press in shift_events.
+function shift_events_Callback(hObject, eventdata, handles)
+% hObject    handle to shift_events (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 mass = handles.metricdata.density * handles.metricdata.volume;
 set(handles.mass, 'String', mass);
 
-% --- Executes on button press in reset.
-function reset_Callback(hObject, eventdata, handles)
-% hObject    handle to reset (see GCBO)
+% --- Executes on button press in cancel.
+function cancel_Callback(hObject, eventdata, handles)
+% hObject    handle to cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 initialize_gui(gcbf, handles, true);
 
-% --- Executes when selected object changed in unitgroup.
-function unitgroup_SelectionChangedFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in unitgroup 
+% --- Executes when selected object changed in uipanelRounding.
+function uipanelRounding_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uipanelRounding 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if (hObject == handles.english)
-    set(handles.text4, 'String', 'lb/cu.in');
-    set(handles.text5, 'String', 'cu.in');
-    set(handles.text6, 'String', 'lb');
-else
-    set(handles.text4, 'String', 'kg/cu.m');
-    set(handles.text5, 'String', 'cu.m');
-    set(handles.text6, 'String', 'kg');
+if (hObject == handles.radioBtnNearest)
+    handles.roundingInput = 'nearest';
+elseif (hObject == handles.radioBtnFloor)
+    handles.roundingInput = 'floor';
+elseif (hObject == handles.radioBtnCeiling)
+    handles.roundingInput = 'ceiling';
 end
+
+% Save the new rounding value
+guidata(hObject,handles)
+
+
+
 
 % --------------------------------------------------------------------
 function initialize_gui(fig_handle, handles, isreset)
-% If the metricdata field is present and the reset flag is false, it means
+% If the metricdata field is present and the cancel flag is false, it means
 % we are we are just re-initializing a GUI by calling it from the cmd line
-% while it is up. So, bail out as we dont want to reset the data.
-if isfield(handles, 'metricdata') && ~isreset
-    return;
-end
+% while it is up. So, bail out as we dont want to cancel the data.
 
-handles.metricdata.density = 0;
-handles.metricdata.volume  = 0;
+% if isfield(handles, 'metricdata') && ~isreset
+%     return;
+% end
+% 
+% handles.metricdata.editboxReplaceChannels = 0;
+% handles.metricdata.editboxIgnoreChannels  = 0;
+% 
+% set(handles.editboxReplaceChannels, 'String', handles.metricdata.editboxReplaceChannels);
+% set(handles.editboxIgnoreChannels,  'String', handles.metricdata.editboxIgnoreChannels);
+% set(handles.mass, 'String', 0);
 
-set(handles.density, 'String', handles.metricdata.density);
-set(handles.volume,  'String', handles.metricdata.volume);
-set(handles.mass, 'String', 0);
 
-set(handles.unitgroup, 'SelectedObject', handles.english);
 
-set(handles.text4, 'String', 'lb/cu.in');
-set(handles.text5, 'String', 'cu.in');
-set(handles.text6, 'String', 'lb');
+set(handles.uipanelRounding, 'SelectedObject', handles.radioBtnNearest);
+
+handles.roundingInput           = 'nearest';
+handles.replaceChannelsInput    = [];
+handles.ignoreChannelsInput     = [];
+ 
 
 % Update handles structure
 guidata(handles.figure1, handles);
+
+
+% --- Executes on key press with focus on shift_events and none of its controls.
+function shift_events_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to shift_events (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function editboxReplaceChannels_Callback(hObject, eventdata, handles)
+% hObject    handle to editboxReplaceChannels (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editboxReplaceChannels as text
+%        str2double(get(hObject,'String')) returns contents of editboxReplaceChannels as a double
+
+% Using `str2num` (vs `str2double`) to handle both string arrray input and
+% single string/character input
+handles.ignoreChannelsInput = str2num(get(hObject,'String'));
+
+% Save the new replace channels value
+guidata(hObject,handles)
+
+
+function editboxIgnoreChannels_Callback(hObject, eventdata, handles)
+% hObject    handle to editboxIgnoreChannels (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editboxIgnoreChannels as text
+%        str2double(get(hObject,'String')) returns contents of editboxIgnoreChannels as a double
+
+handles.ignoreChannelsInput = str2num(get(hObject,'String'));
+
+% Save the new ignore channels value
+guidata(hObject,handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function editboxIgnoreChannels_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editboxIgnoreChannels (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

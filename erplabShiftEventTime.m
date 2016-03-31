@@ -7,27 +7,26 @@ function [ outEEG ] = erplabShiftEventTime(inEEG, eventcodes, timeshift, sample_
 %
 % INPUT:
 %
-%    EEG              - EEGLAB EEG dataset
-%    eventcodes       - list of event codes to shift
-%    timeshift        - time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
-%                       If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
-%                       If timeshift is 0, the EEG's time values are not shifted.
-%    rounding         - Type of rounding to use
-%                       - 'floor'   - Round to nearest ingtowards positive infinity
-%                       - 'ceiling' - Round to nearest integer towards negative infinity
-%                       - 'nearest' - Round to the nearest integer
+%    EEG              EEGLAB EEG dataset
+%    eventcodes       list of event codes to shift
+%    timeshift        time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
+%                       - If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
+%                       - If timeshift is 0, the EEG's time values are not shifted.
+%    rounding         Type of rounding to use
+%                       - 'nearest'    (default) Round to the nearest integer          
+%                       - 'floor'      Round to nearest ingtowards positive infinity
+%                       - 'ceiling'    Round to nearest integer towards negative infinity
 % 
 % OPTIONAL INPUT:
 %
-%    displayFeedback  - 'summary'   - (default) Print summarized info to Command Window
-%                     - 'detailed'  - Print event table with latency differences
-%                                     to Command Window
-%                     - 'both'      - Print both summarized & detailed info
-%                                    to Command Window
+%    displayFeedback  Type of feedback to display at Command window
+%                        - 'summary'   (default) Print summarized info to Command Window
+%                        - 'detailed'  Print event table with latency differences
+%                        - 'both'      Print both summarized & detailed info
 %
 % OUTPUT:
 %
-%    EEG               - EEGLAB EEG dataset with latency shift.
+%    EEG               EEGLAB EEG dataset with latency shift.
 %
 %
 % EXAMPLE:
