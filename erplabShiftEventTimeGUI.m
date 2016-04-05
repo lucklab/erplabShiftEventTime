@@ -142,8 +142,8 @@ function shift_events_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-mass = handles.metricdata.density * handles.metricdata.volume;
-set(handles.mass, 'String', mass);
+% mass = handles.metricdata.density * handles.metricdata.volume;
+% set(handles.mass, 'String', mass);
 
 % --- Executes on button press in cancel.
 function cancel_Callback(hObject, eventdata, handles)
@@ -153,12 +153,17 @@ function cancel_Callback(hObject, eventdata, handles)
 
 initialize_gui(gcbf, handles, true);
 
+disp('User selected Cancel')
+return
+
 % --- Executes when selected object changed in uipanelRounding.
 function uipanelRounding_SelectionChangedFcn(hObject, eventdata, handles)
 % hObject    handle to the selected object in uipanelRounding 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+
+% Set rounding input value depending on which radial button was selected
 if (hObject == handles.radioBtnNearest)
     handles.roundingInput = 'nearest';
 elseif (hObject == handles.radioBtnFloor)
@@ -183,21 +188,32 @@ function initialize_gui(fig_handle, handles, isreset)
 %     return;
 % end
 % 
-% handles.metricdata.editboxReplaceChannels = 0;
-% handles.metricdata.editboxIgnoreChannels  = 0;
-% 
-% set(handles.editboxReplaceChannels, 'String', handles.metricdata.editboxReplaceChannels);
-% set(handles.editboxIgnoreChannels,  'String', handles.metricdata.editboxIgnoreChannels);
-% set(handles.mass, 'String', 0);
-
-
-
-set(handles.uipanelRounding, 'SelectedObject', handles.radioBtnNearest);
 
 handles.roundingInput           = 'nearest';
-handles.replaceChannelsInput    = [];
-handles.ignoreChannelsInput     = [];
+handles.replaceChannelsInput    = '[]';
+handles.ignoreChannelsInput     = '[]';
  
+set(handles.editboxReplaceChannels, 'String',         handles.replaceChannelsInput);
+set(handles.editboxIgnoreChannels,  'String',         handles.ignoreChannelsInput);
+set(handles.uipanelRounding,        'SelectedObject', handles.radioBtnNearest);
+
+
+%
+% Name & version
+%
+version = geterplabversion;
+set(handles.figure1,'Name', ['ERPLAB ' version '   -   EXTRACT BINEPOCHS GUI'])
+
+%
+% Color GUI
+%
+handles = painterplab(handles);
+
+%
+% Set font size
+%
+handles = setfonterplab(handles);
+
 
 % Update handles structure
 guidata(handles.figure1, handles);
