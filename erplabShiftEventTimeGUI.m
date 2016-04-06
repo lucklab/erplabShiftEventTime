@@ -22,7 +22,7 @@ function varargout = erplabShiftEventTimeGUI(varargin)
 
 % Edit the above text to modify the response to help erplabShiftEventTimeGUI
 
-% Last Modified by GUIDE v2.5 31-Mar-2016 15:54:52
+% Last Modified by GUIDE v2.5 06-Apr-2016 13:25:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,7 +60,7 @@ guidata(hObject, handles);
 initialize_gui(hObject, handles, false);
 
 % UIWAIT makes erplabShiftEventTimeGUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+uiwait(handles.gui_figure);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -73,10 +73,14 @@ function varargout = erplabShiftEventTimeGUI_OutputFcn(hObject, eventdata, handl
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+% The figure can be deleted now
+delete(handles.gui_figure);
+pause(0.5)
+
 
 % --- Executes during object creation, after setting all properties.
 % function density_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to editboxReplaceChannels (see GCBO)
+% % hObject    handle to editboxEventCodes (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    empty - handles not created until after all CreateFcns called
 % 
@@ -89,25 +93,25 @@ varargout{1} = handles.output;
 
 
 % function density_Callback(hObject, eventdata, handles)
-% % hObject    handle to editboxReplaceChannels (see GCBO)
+% % hObject    handle to editboxEventCodes (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    structure with handles and user data (see GUIDATA)
 % 
-% % Hints: get(hObject,'String') returns contents of editboxReplaceChannels as text
-% %        str2double(get(hObject,'String')) returns contents of editboxReplaceChannels as a double
-% editboxReplaceChannels = str2double(get(hObject, 'String'));
-% if isnan(editboxReplaceChannels)
+% % Hints: get(hObject,'String') returns contents of editboxEventCodes as text
+% %        str2double(get(hObject,'String')) returns contents of editboxEventCodes as a double
+% editboxEventCodes = str2double(get(hObject, 'String'));
+% if isnan(editboxEventCodes)
 %     set(hObject, 'String', 0);
 %     errordlg('Input must be a number','Error');
 % end
 % 
-% % Save the new editboxReplaceChannels value
-% handles.metricdata.editboxReplaceChannels = editboxReplaceChannels;
+% % Save the new editboxEventCodes value
+% handles.metricdata.editboxEventCodes = editboxEventCodes;
 % guidata(hObject,handles)
 % 
 % % --- Executes during object creation, after setting all properties.
 % function volume_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to editboxIgnoreChannels (see GCBO)
+% % hObject    handle to editboxTimeshift (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    empty - handles not created until after all CreateFcns called
 % 
@@ -120,41 +124,62 @@ varargout{1} = handles.output;
 % 
 % 
 % function volume_Callback(hObject, eventdata, handles)
-% % hObject    handle to editboxIgnoreChannels (see GCBO)
+% % hObject    handle to editboxTimeshift (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    structure with handles and user data (see GUIDATA)
 % 
-% % Hints: get(hObject,'String') returns contents of editboxIgnoreChannels as text
-% %        str2double(get(hObject,'String')) returns contents of editboxIgnoreChannels as a double
-% editboxIgnoreChannels = str2double(get(hObject, 'String'));
-% if isnan(editboxIgnoreChannels)
+% % Hints: get(hObject,'String') returns contents of editboxTimeshift as text
+% %        str2double(get(hObject,'String')) returns contents of editboxTimeshift as a double
+% editboxTimeshift = str2double(get(hObject, 'String'));
+% if isnan(editboxTimeshift)
 %     set(hObject, 'String', 0);
 %     errordlg('Input must be a number','Error');
 % end
 % 
-% % Save the new editboxIgnoreChannels value
-% handles.metricdata.editboxIgnoreChannels = editboxIgnoreChannels;
+% % Save the new editboxTimeshift value
+% handles.metricdata.editboxTimeshift = editboxTimeshift;
 % guidata(hObject,handles)
 
-% --- Executes on button press in shift_events.
-function shift_events_Callback(hObject, eventdata, handles)
-% hObject    handle to shift_events (see GCBO)
+% --- Executes on button press in pushbutton_shiftEvents.
+function pushbutton_shiftEvents_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_shiftEvents (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % mass = handles.metricdata.density * handles.metricdata.volume;
 % set(handles.mass, 'String', mass);
 
-% --- Executes on button press in cancel.
-function cancel_Callback(hObject, eventdata, handles)
-% hObject    handle to cancel (see GCBO)
+% Command-line feedback to user
+display('Shifting events');
+
+% editboxEventCodes_Callback(hObject, eventdata, handles)
+
+% Save the input variables to output
+handles.output = {        ...
+    handles.eventcodes,   ...
+    handles.timeshift,    ...
+    handles.roundingInput ...
+    };
+
+% Update handles structure
+guidata(hObject, handles);
+uiresume(handles.gui_figure);
+
+% --- Executes on button press in pushbutton_cancel.
+function pushbutton_cancel_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-initialize_gui(gcbf, handles, true);
-
+% Command-line feedback to user
 disp('User selected Cancel')
-return
+
+% Clear all input variables
+handles.output = []; 
+
+% Update handles structure
+guidata(hObject, handles);
+uiresume(handles.gui_figure);
 
 % --- Executes when selected object changed in uipanelRounding.
 function uipanelRounding_SelectionChangedFcn(hObject, eventdata, handles)
@@ -180,29 +205,28 @@ guidata(hObject,handles)
 
 % --------------------------------------------------------------------
 function initialize_gui(fig_handle, handles, isreset)
-% If the metricdata field is present and the cancel flag is false, it means
+% If the metricdata field is present and the pushbutton_cancel flag is false, it means
 % we are we are just re-initializing a GUI by calling it from the cmd line
-% while it is up. So, bail out as we dont want to cancel the data.
+% while it is up. So, bail out as we dont want to pushbutton_cancel the data.
 
-% if isfield(handles, 'metricdata') && ~isreset
-%     return;
-% end
-% 
 
-handles.roundingInput           = 'nearest';
-handles.replaceChannelsInput    = '[]';
-handles.ignoreChannelsInput     = '[]';
+
+handles.roundingInput = 'nearest';
+handles.eventcodes    = '[]';
+handles.timeshift     = 0;
  
-set(handles.editboxReplaceChannels, 'String',         handles.replaceChannelsInput);
-set(handles.editboxIgnoreChannels,  'String',         handles.ignoreChannelsInput);
-set(handles.uipanelRounding,        'SelectedObject', handles.radioBtnNearest);
+% erplabShiftEventTime(EEG, eventcodes, timeshift, rounding, (opt) displayfeedback)
+
+set(handles.editboxEventCodes, 'String',         handles.eventcodes);
+set(handles.editboxTimeshift,  'String',         num2str(handles.timeshift));
+set(handles.uipanelRounding,   'SelectedObject', handles.radioBtnNearest);
 
 
 %
 % Name & version
 %
 version = geterplabversion;
-set(handles.figure1,'Name', ['ERPLAB ' version '   -   EXTRACT BINEPOCHS GUI'])
+set(handles.gui_figure,'Name', ['ERPLAB ' version '   -   EXTRACT BINEPOCHS GUI'])
 
 %
 % Color GUI
@@ -216,53 +240,50 @@ handles = setfonterplab(handles);
 
 
 % Update handles structure
-guidata(handles.figure1, handles);
-
-
-% --- Executes on key press with focus on shift_events and none of its controls.
-function shift_events_KeyPressFcn(hObject, eventdata, handles)
-% hObject    handle to shift_events (see GCBO)
-% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
-%	Key: name of the key that was pressed, in lower case
-%	Character: character interpretation of the key(s) that was pressed
-%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
-% handles    structure with handles and user data (see GUIDATA)
+guidata(handles.gui_figure, handles);
 
 
 
-function editboxReplaceChannels_Callback(hObject, eventdata, handles)
-% hObject    handle to editboxReplaceChannels (see GCBO)
+
+function editboxEventCodes_Callback(hObject, eventdata, handles)
+% hObject    handle to editboxEventCodes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editboxReplaceChannels as text
-%        str2double(get(hObject,'String')) returns contents of editboxReplaceChannels as a double
+% Hints: get(hObject,'String') returns contents of editboxEventCodes as text
+%        str2double(get(hObject,'String')) returns contents of editboxEventCodes as a double
 
 % Using `str2num` (vs `str2double`) to handle both string arrray input and
 % single string/character input
-handles.ignoreChannelsInput = str2num(get(hObject,'String'));
+
+% Strip any non-numeric token and replace w/ whitespace (' ')
+editString         = regexprep(get(hObject,'String'), '[\D]', ' ');
+handles.eventcodes = str2num(editString);  %#ok<ST2NM>
+
+% Display corrected eventcode string back to GUI
+set(handles.editboxEventCodes, 'String', editString);
 
 % Save the new replace channels value
 guidata(hObject,handles)
 
 
-function editboxIgnoreChannels_Callback(hObject, eventdata, handles)
-% hObject    handle to editboxIgnoreChannels (see GCBO)
+function editboxTimeshift_Callback(hObject, eventdata, handles)
+% hObject    handle to editboxTimeshift (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editboxIgnoreChannels as text
-%        str2double(get(hObject,'String')) returns contents of editboxIgnoreChannels as a double
+% Hints: get(hObject,'String') returns contents of editboxTimeshift as text
+%        str2double(get(hObject,'String')) returns contents of editboxTimeshift as a double
 
-handles.ignoreChannelsInput = str2num(get(hObject,'String'));
+handles.timeshift = str2num(get(hObject,'String'));
 
 % Save the new ignore channels value
 guidata(hObject,handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function editboxIgnoreChannels_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editboxIgnoreChannels (see GCBO)
+function editboxTimeshift_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editboxTimeshift (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

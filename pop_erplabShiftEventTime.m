@@ -35,10 +35,10 @@ if nargin==1
     end
     
     %     % Get previous input parameters
-    %     def  = erpworkingmemory('pop_erplabShiftEventTime');
-    %     if isempty(def)
-    %         def = {'' 'boundary' -99 1 1};
-    %     end
+    def  = erpworkingmemory('pop_erplabShiftEventTime');
+    if isempty(def)
+        def = {};
+    end
     
     
     % Call GUI    
@@ -53,11 +53,11 @@ if nargin==1
     eventcodes          = inputstrMat{1};
     timeshift           = inputstrMat{2};
     rounding            = inputstrMat{3};
-    displayFeedback     = inputstrMat{4};
-    
-    erpworkingmemory('pop_erplabShiftEventTime', ...
-        {eventcodes, timeshift, rounding, displayFeedback});
-    
+%     displayFeedback     = inputstrMat{4};
+%     
+%     erpworkingmemory('pop_erplabShiftEventTime', ...
+%         {eventcodes, timeshift, rounding, displayFeedback});
+%     
     
     % New output EEG name
     if length(EEG)==1
@@ -66,11 +66,11 @@ if nargin==1
     
     
     [EEG, com] = pop_erplabShiftEventTime(EEG, ...
-        'Eventlist'             , eventcodes, ...
-        'BoundaryString'        , timeshift,...
-        'BoundaryNumeric'       , rounding, ...
-        'Warning'               , striswarning, ...
-        'History'               , 'gui');
+        'Eventcodes'      , eventcodes,  ...
+        'Timeshift'      , timeshift,   ...
+        'Rounding'       , rounding     );
+    
+    
     return
 end
 
@@ -86,11 +86,11 @@ inputParameters.CaseSensitive = false;
 % Required parameters
 inputParameters.addRequired('EEG');
 % Optional named parameters (vs Positional Parameters)
-inputParameters.addParam('Eventcodes'         , []);
-inputParameters.addParam('Timeshift'          , 0);
-inputParameters.addParam('Rounding'           , 'nearest');
-inputParameters.addParam('DisplayFeedback'    , 'summary'); % old parameter for BoundaryString
-% inputParameters.addParam('History'            , 'script', @ischar); % history from scripting
+inputParameters.addParameter('Eventcodes'         , []);
+inputParameters.addParameter('Timeshift'          , 0);
+inputParameters.addParameter('Rounding'           , 'nearest');
+inputParameters.addParameter('DisplayFeedback'    , 'summary'); % old parameter for BoundaryString
+% inputParameters.addParameter('History'            , 'script', @ischar); % history from scripting
 
 inputParameters.parse(EEG, varargin{:});
 
@@ -115,61 +115,61 @@ inputParameters.parse(EEG, varargin{:});
 
 %% Generate equivalent command (for history)
 %
-skipfields = {'EEG', 'Warning', 'History'};
-fn  = fieldnames(p.Results);
-com = sprintf( '%s  = pop_creabasiceventlist( %s ', inputname(1), inputname(1));
+skipfields  = {'EEG', 'DisplayFeedback'};
+fn          = fieldnames(inputParameters.Results);
+com         = sprintf( '%s  = pop_erplabShiftEventTime( %s ', inputname(1), inputname(1));
 for q=1:length(fn)
-        fn2com = fn{q}; % get fieldname
-        if ~ismember_bc2(fn2com, skipfields)
-                fn2res = p.Results.(fn2com); % get content of current field
-                if ~isempty(fn2res)
-                        if iscell(fn2res)
-                                com = sprintf( '%s, ''%s'', {', com, fn2com);
-                                for c=1:length(fn2res)
-                                        getcont = fn2res{c};
-                                        if ischar(getcont)
-                                                fnformat = '''%s''';
-                                        else
-                                                fnformat = '%s';
-                                                getcont = num2str(getcont);
-                                        end
-                                        com = sprintf( [ '%s ' fnformat], com, getcont);
-                                end
-                                com = sprintf( '%s }', com);
-                        else
-                                if ischar(fn2res)
-                                        if ~strcmpi(fn2res,'off')
-                                                com = sprintf( '%s, ''%s'', ''%s''', com, fn2com, fn2res);
-                                        end
-                                else
-                                        %if iscell(fn2res)
-                                        %        fn2resstr = vect2colon(cell2mat(fn2res), 'Sort','on');
-                                        %        fnformat = '{%s}';
-                                        %else
-                                        fn2resstr = vect2colon(fn2res, 'Sort','on');
-                                        fnformat = '%s';
-                                        %end
-                                        com = sprintf( ['%s, ''%s'', ' fnformat], com, fn2com, fn2resstr);
-                                end
-                        end
+    fn2com = fn{q}; % get fieldname
+    if ~ismember(fn2com, skipfields)
+        fn2res = inputParameters.Results.(fn2com); % get content of current field
+        if ~isempty(fn2res)
+            if iscell(fn2res)
+                com = sprintf( '%s, ''%s'', {', com, fn2com);
+                for c=1:length(fn2res)
+                    getcont = fn2res{c};
+                    if ischar(getcont)
+                        fnformat = '''%s''';
+                    else
+                        fnformat = '%s';
+                        getcont = num2str(getcont);
+                    end
+                    com = sprintf( [ '%s ' fnformat], com, getcont);
                 end
+                com = sprintf( '%s }', com);
+            else
+                if ischar(fn2res)
+                    if ~strcmpi(fn2res,'off')
+                        com = sprintf( '%s, ''%s'', ''%s''', com, fn2com, fn2res);
+                    end
+                else
+                    %if iscell(fn2res)
+                    %        fn2resstr = vect2colon(cell2mat(fn2res), 'Sort','on');
+                    %        fnformat = '{%s}';
+                    %else
+                    fn2resstr = vect2colon(fn2res, 'Sort','on');
+                    fnformat = '%s';
+                    %end
+                    com = sprintf( ['%s, ''%s'', ' fnformat], com, fn2com, fn2resstr);
+                end
+            end
         end
+    end
 end
 com = sprintf( '%s );', com);
 
 % get history from script. EEG
-switch shist
-        case 1 % from GUI
-                com = sprintf('%s %% GUI: %s', com, datestr(now));
-                %fprintf('%%Equivalent command:\n%s\n\n', com);
-                displayEquiComERP(com);
-        case 2 % from script
-                EEG = erphistory(EEG, [], com, 1);
-        case 3
-                % implicit
-        otherwise %off or none
-                com = '';
-end
+% switch shist
+%         case 1 % from GUI
+%                 com = sprintf('%s %% GUI: %s', com, datestr(now));
+%                 %fprintf('%%Equivalent command:\n%s\n\n', com);
+%                 displayEquiComERP(com);
+%         case 2 % from script
+%                 EEG = erphistory(EEG, [], com, 1);
+%         case 3
+%                 % implicit
+%         otherwise %off or none
+%                 com = '';
+% end
 
 
 %
