@@ -1,8 +1,56 @@
-function [EEG, com] = pop_erplabShiftEventTime( EEG, varargin )
-%POP_ERPLABSHIFTEVENTTIME Summary of this function goes here
-%   Detailed explanation goes here
+function [EEG, commandHistory] = pop_erplabShiftEventTime( EEG, varargin )
+%POP_ERPLABSHIFTEVENTTIME In EEG data, shift the timing of user-specified event codes.
+%
+% FORMAT
+%
+%    EEG = pop_erplabShiftEventTime(inEEG, eventcodes, timeshift)
+%
+% INPUT:
+%
+%    EEG              EEGLAB EEG dataset
+%    eventcodes       list of event codes to shift
+%    timeshift        time in sec. If timeshift is positive, the EEG event code time-values are shifted to the right (e.g. increasing delay).
+%                       - If timeshift is negative, the event code time-values are shifted to the left (e.g decreasing delay).
+%                       - If timeshift is 0, the EEG's time values are not shifted.
+%    rounding         Type of rounding to use
+%                       - 'nearest'    (default) Round to the nearest integer          
+%                       - 'floor'      Round to nearest ingtowards positive infinity
+%                       - 'ceiling'    Round to nearest integer towards negative infinity
+% 
+% OPTIONAL INPUT:
+%
+%    displayFeedback  Type of feedback to display at Command window
+%                        - 'summary'   (default) Print summarized info to Command Window
+%                        - 'detailed'  Print event table with latency differences
+%                        - 'both'      Print both summarized & detailed info
+%
+% OUTPUT:
+%
+%    EEG               EEGLAB EEG dataset with latency shift.
+%
+%
+% EXAMPLE:
+%
+%     eventcodes = {'22', '19'};
+%     timeshift  = 0.015;
+%     rounding   = 'floor';
+%     outputEEG  = erplabShiftEventTime(inputEEG, eventcodes, timeshift, rounding);
+%     
+%
+% Requirements:
+%   - EEG_CHECKSET (eeglab function)
+%
+% See also eegtimeshift.m erptimeshift.m
+%
+%
+% *** This function is part of ERPLAB Toolbox ***
+% Author: Jason Arita
+% Center for Mind and Brain
+% University of California, Davis,
+% Davis, CA
+% 2009
 
-com = '';
+commandHistory = '';
 
 % Return help if given no input
 if nargin < 1
@@ -17,7 +65,7 @@ if isobject(EEG) % eegobj
     return
 end
 
-%% Call GUI 
+%% Call GUI
 % When only 1 input is given the GUI is then called
 if nargin==1
     
@@ -41,23 +89,23 @@ if nargin==1
     end
     
     
-    % Call GUI    
+    % Call GUI
     inputstrMat = erplabShiftEventTimeGUI(def);  % GUI
     
     % Exit when CANCEL button is pressed
     if isempty(inputstrMat) && ~strcmp(inputstrMat,'')
-        disp('User selected Cancel')
-        return
+        commandHistory = 'User selected cancel';
+        return;
     end
     
     eventcodes          = inputstrMat{1};
     timeshift           = inputstrMat{2};
     rounding            = inputstrMat{3};
-%     displayFeedback     = inputstrMat{4};
-%     
-%     erpworkingmemory('pop_erplabShiftEventTime', ...
-%         {eventcodes, timeshift, rounding, displayFeedback});
-%     
+    %     displayFeedback     = inputstrMat{4};
+    %
+    %     erpworkingmemory('pop_erplabShiftEventTime', ...
+    %         {eventcodes, timeshift, rounding, displayFeedback});
+    %
     
     % New output EEG name
     if length(EEG)==1
@@ -65,10 +113,11 @@ if nargin==1
     end
     
     
-    [EEG, com] = pop_erplabShiftEventTime(EEG, ...
-        'Eventcodes'      , eventcodes,  ...
-        'Timeshift'      , timeshift,   ...
-        'Rounding'       , rounding     );
+    [EEG, commandHistory] = pop_erplabShiftEventTime(EEG, ...
+        'Eventcodes'    , eventcodes,  ...
+        'Timeshift'     , timeshift,   ...
+        'Rounding'      , rounding,    ...
+        'History'       , 'gui');
     
     
     return
@@ -90,7 +139,7 @@ inputParameters.addParameter('Eventcodes'         , []);
 inputParameters.addParameter('Timeshift'          , 0);
 inputParameters.addParameter('Rounding'           , 'nearest');
 inputParameters.addParameter('DisplayFeedback'    , 'summary'); % old parameter for BoundaryString
-% inputParameters.addParameter('History'            , 'script', @ischar); % history from scripting
+inputParameters.addParameter('History'            , 'script', @ischar); % history from scripting
 
 inputParameters.parse(EEG, varargin{:});
 
@@ -115,16 +164,16 @@ inputParameters.parse(EEG, varargin{:});
 
 %% Generate equivalent command (for history)
 %
-skipfields  = {'EEG', 'DisplayFeedback'};
+skipfields  = {'EEG', 'DisplayFeedback', 'History'};
 fn          = fieldnames(inputParameters.Results);
-com         = sprintf( '%s  = pop_erplabShiftEventTime( %s ', inputname(1), inputname(1));
+commandHistory         = sprintf( '%s  = pop_erplabShiftEventTime( %s ', inputname(1), inputname(1));
 for q=1:length(fn)
     fn2com = fn{q}; % get fieldname
     if ~ismember(fn2com, skipfields)
         fn2res = inputParameters.Results.(fn2com); % get content of current field
         if ~isempty(fn2res)
             if iscell(fn2res)
-                com = sprintf( '%s, ''%s'', {', com, fn2com);
+                commandHistory = sprintf( '%s, ''%s'', {', commandHistory, fn2com);
                 for c=1:length(fn2res)
                     getcont = fn2res{c};
                     if ischar(getcont)
@@ -133,13 +182,13 @@ for q=1:length(fn)
                         fnformat = '%s';
                         getcont = num2str(getcont);
                     end
-                    com = sprintf( [ '%s ' fnformat], com, getcont);
+                    commandHistory = sprintf( [ '%s ' fnformat], commandHistory, getcont);
                 end
-                com = sprintf( '%s }', com);
+                commandHistory = sprintf( '%s }', commandHistory);
             else
                 if ischar(fn2res)
                     if ~strcmpi(fn2res,'off')
-                        com = sprintf( '%s, ''%s'', ''%s''', com, fn2com, fn2res);
+                        commandHistory = sprintf( '%s, ''%s'', ''%s''', commandHistory, fn2com, fn2res);
                     end
                 else
                     %if iscell(fn2res)
@@ -149,27 +198,27 @@ for q=1:length(fn)
                     fn2resstr = vect2colon(fn2res, 'Sort','on');
                     fnformat = '%s';
                     %end
-                    com = sprintf( ['%s, ''%s'', ' fnformat], com, fn2com, fn2resstr);
+                    commandHistory = sprintf( ['%s, ''%s'', ' fnformat], commandHistory, fn2com, fn2resstr);
                 end
             end
         end
     end
 end
-com = sprintf( '%s );', com);
+commandHistory = sprintf( '%s );', commandHistory);
 
 % get history from script. EEG
-% switch shist
-%         case 1 % from GUI
-%                 com = sprintf('%s %% GUI: %s', com, datestr(now));
-%                 %fprintf('%%Equivalent command:\n%s\n\n', com);
-%                 displayEquiComERP(com);
-%         case 2 % from script
-%                 EEG = erphistory(EEG, [], com, 1);
-%         case 3
-%                 % implicit
-%         otherwise %off or none
-%                 com = '';
-% end
+switch inputParameters.Results.History
+    case 'gui' % from GUI
+        commandHistory = sprintf('%s %% GUI: %s', commandHistory, datestr(now));
+        %fprintf('%%Equivalent command:\n%s\n\n', commandHistory);
+        displayEquiComERP(commandHistory);
+    case 'script' % from script
+        EEG = erphistory(EEG, [], commandHistory, 1);
+    case 'implicit'
+        % implicit
+    otherwise %off or none
+        commandHistory = '';
+end
 
 
 %
@@ -178,9 +227,8 @@ com = sprintf( '%s );', com);
 prefunc = dbstack;
 nf = length(unique_bc2({prefunc.name}));
 if nf==1
-        msg2end
+    msg2end
 end
 return
 
 end
-
